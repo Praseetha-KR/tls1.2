@@ -1,6 +1,10 @@
 from enum import Enum
 
 
+def hexsplit(hexnum):
+    return list(divmod(hexnum, 0x100))
+
+
 class CipherSuiteEnum(Enum):
     TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305_SHA256 = 0xcc14
     TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256 = 0xc02b
@@ -30,6 +34,17 @@ class CipherSuiteEnum(Enum):
     TLS_RSA_WITH_AES_128_CBC_SHA = 0x002f
     TLS_RSA_WITH_AES_256_CBC_SHA = 0x0035
     TLS_EMPTY_RENEGOTIATION_INFO_SCSV = 0x00ff
+
+    @classmethod
+    def get_keys(cls):
+        return [hexsplit(x.value) for x in cls]
+
+    @classmethod
+    def get_key(cls, value):
+        for e in cls:
+            if e.value == value:
+                return e.name
+        return None
 
 
 class ECSupportedGroupEnum(Enum):
@@ -62,6 +77,17 @@ class ECSupportedGroupEnum(Enum):
     sect163r1 = 0x0002
     sect163k1 = 0x0001
 
+    @classmethod
+    def get_keys(cls):
+        return [hexsplit(x.value) for x in cls]
+
+    @classmethod
+    def get_key(cls, value):
+        for e in cls:
+            if e.value == value:
+                return e.name
+        return None
+
 
 class SignatureHashAlgorithms(Enum):
     ecdsa_secp521r1_sha512 = 0x0603
@@ -79,3 +105,23 @@ class SignatureHashAlgorithms(Enum):
     ecdsa_sha1 = 0x0203
     SHA1_DSA = 0x0202
     rsa_pkcs1_sha1 = 0x0201
+
+    @classmethod
+    def to_sign_hash(cls, value):
+        [hash, signature] = hexsplit(value)
+        return {
+            "hash": hash,
+            "signature": signature,
+        }
+
+    @classmethod
+    def get_keys(cls):
+        return [cls.to_sign_hash(x.value) for x in cls]
+
+    @classmethod
+    def get_key(cls, hash, sign):
+        value = hash * 0x100 + sign
+        for e in cls:
+            if e.value == value:
+                return e.name
+        return None

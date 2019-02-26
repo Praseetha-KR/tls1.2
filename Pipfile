@@ -9,6 +9,8 @@ name = "pypi"
 [packages]
 construct = "*"
 ipdb = "*"
+cryptography = "*"
+rsa = "*"
 
 [requires]
 python_version = "3.7"
